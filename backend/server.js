@@ -1,25 +1,26 @@
 import 'dotenv/config'
-
-import './config/connection.js'
-
 import express from 'express'
 import cors from 'cors'
+import mongoose from 'mongoose'
 
-import userRoutes from './routes/users.js'
-import postRoutes from './routes/posts.js'
+import authRoutes from './routes/authRoutes.js'
+import projectRoutes from './routes/projectRoutes.js'
 
 const app = express()
-
-const port = process.env.PORT || 3000
 
 app.use(cors())
 app.use(express.json())
 
-app.use('/api/posts', postRoutes)
-app.use('/api/users', userRoutes)
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("DB connected"))
+  .catch(err => console.log(err))
+
+app.use('/api/auth', authRoutes)
+app.use('/api/projects', projectRoutes)
 
 app.get('/', (req, res) => {
-    res.send('Hello World')
+  res.send('API running')
 })
 
-app.listen(port, () => console.log(`Listening on port: http://localhost:${port}`))
+const port = process.env.PORT || 3000
+app.listen(port, () => console.log(`Server running on ${port}`))

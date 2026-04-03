@@ -1,40 +1,14 @@
-import './App.css'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Feed from './pages/Feed'
-
-import Navbar from './components/Navbar'
-
-import { useUser } from './context/UserContext'
-
-function App() {
-
-  // bring in user info
-  const { user } = useUser()
-
+export default function App() {
   return (
-    <>
-
-      <Navbar />
-
-      {user ?
-        <Routes>
-          <Route path="/feed" element={<Feed />} />
-          <Route path="*" element={<Navigate to="/feed" />} />
-        </Routes>
-        :
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<Navigate to="/login" />}  />
-        </Routes>
-      }
-
-
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
-export default App

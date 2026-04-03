@@ -1,78 +1,61 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import API from "../services/api"
 
-import { useNavigate } from "react-router-dom";
-import { token, userClient } from "../clients/api";
+const UserContext = createContext()
 
-const UserContext = createContext(null)
+export function UserProvider({ children }) {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-// if there's a token, assume there's a user that just needs to be verified
-const initialUser = token() ? { username: null } : null
+  const navigate = useNavigate()
 
-// custom provider to wrap our App
-function UserProvider({ children }) {
+  // Check if user is logged in on app load
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token")
 
-    // set the initial state to null or a temporary user: { username: null }
-    const [user, setUser] = useState(initialUser)
+      if (!token) {
+        setLoading(false)
+        return
+      }
 
-    const navigate = useNavigate()
-
-    // useEffect that verifies the token and retrieves user data
-    useEffect(() => {
-
-        async function getUser() {
-
-            try {
-                // check if there's a token (if no token, then we can skip steps)
-                if (!token()) return
-
-                // use the token to verify the user (is token valid? is it expired?)
-                const { data } = await userClient.get('/')
-            
-                // if verified that token is legit, take the user data and save it to state
-                setUser(data)
-            } catch(err) {
-                // if verification fails, logout the user 
-                console.log(err)
-                logout()
-            }
-
-        }
-
-        getUser()
-
-
-    }, [])
-
-    const logout = () => {
-        // clear the user state
-        setUser(null)
-
-        // clear the local storage
-        localStorage.removeItem("token")
-
-        // navigate the user to login 
-        navigate('/login')
+      try {
+        const { data } = await API.get("/auth/me")
+        setUser(data)
+      } catch (err) {
+        console.error(err)
+        logout()
+      } finally {
+        setLoading(false)
+      }
     }
 
-    // packaging up everything we want available to make available from our context
-    const value = {
-        user, 
-        setUser,
-        logout
-    }
+    fetchUser()
+  }, [])
 
-    return (
-        <UserContext.Provider value={value}>
-            {/* "children" here represents our <App /> */}
-            {children}
-        </UserContext.Provider>
-    )
+  // Login function
+  const login = (token) => {
+    localStorage.setItem("token", token)
+    setUser({}) // temporary until fetched
+    navigate("/")
+  }
+
+  // Logout function
+  const logout = () => {
+    localStorage.removeItem("token")
+    setUser(null)
+    navigate("/login")
+  }
+
+  return (
+    <UserContext.Provider value={{ user, setUser, login, logout, loading }}>
+      {children}
+    </UserContext.Provider>
+  )
 }
 
-// custom hook to easily access context value
+// Custom hook
 export function useUser() {
-    return useContext(UserContext)
-} 
-
-
-export default UserProvider
+  return useContext(UserContext)
+}

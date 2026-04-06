@@ -1,4 +1,4 @@
-const API = "http://localhost:5001/api";
+const API = " https://project-mern-development-backend.onrender.com/api";
 
 export const request = async (url, method = "GET", body, token) => {
   const res = await fetch(`${API}${url}`, {

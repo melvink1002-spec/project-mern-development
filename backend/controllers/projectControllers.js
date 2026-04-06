@@ -1,4 +1,3 @@
-// backend/controllers/projectControllers.js
 import Project from "../models/Project.js";
 
 // GET

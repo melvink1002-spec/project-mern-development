@@ -1,19 +1,19 @@
-# Pro-Tasker
+Pro-Tasker
 
-Pro-Tasker is a full-stack task and project management application built with **React**, **Node.js/Express**, and **MongoDB**. Users can create projects, add tasks, and manage progress in a Kanban-style interface. The app supports authentication, project CRUD operations, and task management, providing a lightweight yet robust productivity tool.
+Pro-Tasker is a full-stack task and project management application built with React, Node.js/Express**, and MongoDB. Users can create projects, add tasks, and manage progress. The app supports authentication, project CRUD operations, and task management, providing a lightweight yet robust productivity tool.
 
-## Features
+Features:
 - User authentication (login/register)
 - Create, update, and delete projects
 - Add, update, and delete tasks per project
 - task board
 - Responsive UI
 
-## Live Demo
+Live Demo:
 Frontend: https://project-mern-development-frontend.onrender.com
 Backend:  https://project-mern-development-backend.onrender.com
 
-## Setup and Running Locally
+Setup and Running Locally:
 
 Clone the repository:
 ```bash

@@ -1,52 +1,28 @@
 import express from "express";
-import Project from "../models/Project.js";
-import Task from "../models/Task.js";
-import { protect, authorizeProject } from "../middleware/authMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js";
+import {
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject,
+} from "../controllers/projectControllers.js";
+import taskRoutes from "./taskRoutes.js";
 
 const router = express.Router();
 
-// PROJECT CRUD
-router.get("/", protect, async (req, res) => {
-  const projects = await Project.find({ owner: req.user._id });
-  res.json(projects);
-});
+// Protect all routes below
+router.use(protect);
 
-router.post("/", protect, async (req, res) => {
-  const project = await Project.create({ ...req.body, owner: req.user._id });
-  res.json(project);
-});
+// Project CRUD
+router.route("/")
+  .get(getProjects)
+  .post(createProject);
 
-router.get("/:id", protect, async (req, res) => {
-  const project = await Project.findById(req.params.id);
-  if (!authorizeProject(project, req.user._id))
-    return res.status(403).json({ message: "Forbidden" });
-  res.json(project);
-});
+router.route("/:id")
+  .put(updateProject)
+  .delete(deleteProject);
 
-router.put("/:id", protect, async (req, res) => {
-  const project = await Project.findById(req.params.id);
-  if (!authorizeProject(project, req.user._id))
-    return res.status(403).json({ message: "Forbidden" });
-
-  Object.assign(project, req.body);
-  await project.save();
-  res.json(project);
-});
-
-router.delete("/:id", protect, async (req, res) => {
-  const project = await Project.findById(req.params.id);
-  if (!authorizeProject(project, req.user._id))
-    return res.status(403).json({ message: "Forbidden" });
-
-  await project.deleteOne();
-  res.json({ message: "Deleted" });
-});
-
-// TASK CRUD
-router.post("/:projectId/tasks", protect, async (req, res) => {
-  const project = await Project.findById(req.params.projectId);
-  if (!authorizeProject(project, req.user._id))
-    return res.status(403).json({ message: "Forbidden" });
-});
+// Nested task routes
+router.use("/:projectId/tasks", taskRoutes);
 
 export default router;

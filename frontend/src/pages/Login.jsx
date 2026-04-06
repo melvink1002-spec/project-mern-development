@@ -1,21 +1,71 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { request } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
+  const { login } = useContext(AuthContext);
+  const nav = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    const res = await axios.post("http://localhost:3000/api/auth/login", { email, password });
-    localStorage.setItem("token", res.data.token);
-    window.location = "/";
+  const submit = async (e) => {
+    e.preventDefault();
+
+    if (!form.email || !form.password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const data = await request("/auth/login", "POST", form);
+
+      if (!data.token) {
+        alert(data.message || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      // Save token in context
+      login(data.token);
+
+      // Redirect to dashboard
+      nav("/"); 
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Login failed. Check console for details.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div>
-      <input placeholder="email" onChange={e => setEmail(e.target.value)} />
-      <input placeholder="password" type="password" onChange={e => setPassword(e.target.value)} />
-      <button onClick={handleSubmit}>Login</button>
+    <div style={{ padding: "20px", maxWidth: "400px", margin: "0 auto" }}>
+      <h2>Login</h2>
+
+      <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          required
+        />
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
     </div>
   );
 }

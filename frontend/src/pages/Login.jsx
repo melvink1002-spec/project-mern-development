@@ -43,7 +43,7 @@ export default function Login() {
 
   return (
     <div style={{ padding: "20px", maxWidth: "400px", margin: "0 auto" }}>
-      <h2>Login</h2>
+<h2 style={{ textAlign: "center", marginBottom: "20px" }}>Login</h2>
 
       <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <input

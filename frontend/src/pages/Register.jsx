@@ -41,10 +41,10 @@ export default function Register() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Register</h2>
+    <div style={{ padding: "20px", maxWidth: "400px", margin: "0 auto" }}>
+<h2 style={{ textAlign: "center", marginBottom: "20px" }}>Register</h2>
 
-      <form onSubmit={submit} autoComplete="on">
+      <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         <input
           type="email"
           name="email"
